@@ -1,9 +1,12 @@
 ﻿using AngleSharp.Html.Parser;
 using EcampusApi.Constans;
 using EcampusApi.Entity;
+using EcampusApi.Helpers;
 using EcampusApi.Services.Interfaces;
+using JSONUtils;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -37,8 +40,11 @@ namespace EcampusApi.Services
             client = ClientGeneration.GetClient();
         }
 
-
-        public async Task<Root> GetMyScheduleAsync()
+        /// <summary>
+        /// Получаем расписание на текущею неделю
+        /// </summary>
+        /// <returns></returns>
+        public async Task<IList<Root>> GetScheduleAsync()
         {
             var scheduleResponse = await client.GetAsync(Links.BaseLink + Links.ScheduleLink);
             
@@ -47,13 +53,21 @@ namespace EcampusApi.Services
                 var content = await scheduleResponse.Content.ReadAsStringAsync();
                 var doc = parser.ParseDocument(content);
                 var element = doc.QuerySelector("script[type='text/javascript']");
-                var jsonShedule = GetJsonSchedule(element.TextContent);
-                var shedule = JsonConvert.DeserializeObject<Root>(jsonShedule);                
-                return shedule;
+                var id = TextWorker.GetUserId(element.TextContent);
+                var jsonShedule = await GetJsonSchedule(id);
+                var schedule = JsonConvert.DeserializeObject<IList<Root>>(jsonShedule);
+                return schedule;
             }
-            return new Root();
+            return new List<Root>();
         }
-
+        /// <summary>
+        /// Получаем расписание на след. неделю
+        /// </summary>
+        /// <returns></returns>
+        public async Task<Root> GetScheduleNextWeek()
+        {
+            throw new Exception();
+        }
         /// <summary>
         /// Method for authorization in to the system
         /// </summary>
@@ -132,24 +146,19 @@ namespace EcampusApi.Services
         /// </summary>
         /// <param name="content"></param>
         /// <returns></returns>
-        private string GetJsonSchedule(string content)
+        private async Task<string> GetJsonSchedule(string id)
         {
-            var JsonContent = content.Remove(0, content.IndexOf("weekdays") +10);
-            JsonContent = JsonContent.Remove(JsonContent.IndexOf("\"weeks") -1);
-
-            JsonContent = JsonContent.Replace("JSON.parse(","");
-            JsonContent = JsonContent.Replace(")", "");
-            JsonContent = JsonContent.Replace(@"\""", "");
-            JsonContent =  "{\"Shedule\"" +  $":{JsonContent}}}";
-            return JsonContent;
+            var body = new 
+            { 
+                Date = DateTime.Now.Date.ToString("yyyy-MM-dd") + "T00:00:00.000Z",
+                Id = Convert.ToInt32(id),
+                TargetType = 4
+            };
+            var content = new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json");
+            var response = await client.PostAsync(Links.BaseLink + Links.SchedulePostLink, content);
+            var json = await response.Content.ReadAsStringAsync();
+            return json;
         }
-        public async Task<Shedule> GetScheduleOn(DateTime day)
-        {
-            var schedule = await GetMyScheduleAsync();
-
-            var currentSchedule = schedule.Shedule[((int)day.DayOfWeek) - 1];
-
-            return currentSchedule;
-        }
+   
     }
 }

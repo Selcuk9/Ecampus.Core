@@ -1,4 +1,6 @@
-﻿using BotEcampus.UI.DataBase;
+﻿using BotEcampus.Core.Models;
+using BotEcampus.UI.DataBase;
+using BotEcampus.UI.Services.BotCommand;
 using EcampusApi.Services;
 using System;
 using System.Collections.Generic;
@@ -29,38 +31,59 @@ namespace BotEcampus.Core
         {
             messageManager.OnNewMessage += async (message) =>
             {
-                var isExist = db.GetUserById(message.FromId);
+                var userId = message.FromId;
+                var fdd = message.Payload;
+                var text = message.Text;
+                var sheduleKeyboard = Commands.GetOptionalKeyboard();
+                EcampusClient clientECampus = new EcampusClient();
+                var isExist = db.GetUserById(userId);
                 if (message.Text.ToLower() == "начать")
                 {
                     if (isExist == null)
                     {
-                       await messageManager.SendMessageAsync("Здравствуйте, пожалуйста введите ваш Логин и пароль " +
-                          "от \"Электронный кампус СКФУ\"\nПример: login:password",message.FromId);
+                       await messageManager.SendMessageAsync("Здравствуйте, я ваш помощник Хасан, пожалуйста введите ваш Логин и пароль " +
+                          "от \"Электронный кампус СКФУ\"\nПример: login:password", userId);
+                        return;
                     }
                     else
                     {
-                        var keyboard = new KeyboardBuilder()
-                        .AddButton("Подтвердить", "btnValue", KeyboardButtonColor.Primary)
-                        .SetInline(false)
-                        .SetOneTime()
-                        .AddLine()
-                        .AddButton("Отменить", "btnValue2", KeyboardButtonColor.Default)
-                        .AddButton("Отменить2", "btnValue2", KeyboardButtonColor.Default)
-                        .Build();
-                        await messageManager.SendMessageAsync("Функционал бота", message.FromId, keyboard);
+                        await messageManager.SendMessageAsync("Функционал бота", userId, sheduleKeyboard);
                     }
                 }
-                EcampusClient clientECampus = new EcampusClient();
-              
+
+                
                 if (isExist != null)
                 {
-
-
+                    var login = await clientECampus.LoginAsync(isExist.Split(':')[0], isExist.Split(':')[1]);
+                    if (login.IsSuccess)
+                    {
+                        string answer = await Commands.GetAnswerForAuthorizeUser(text, clientECampus);
+                        await messageManager.SendMessageAsync(answer, userId, sheduleKeyboard);
+                    }
+                    else
+                    {
+                        await messageManager.SendMessageAsync("Сервер вернул ошибку", userId, sheduleKeyboard);
+                    }
+                    
                 }
                 else
                 {
-                   
+                    
+                    var answer =  await Commands.GetAnswerAnonymousUser(text, clientECampus);
+                    if (answer.Contains("успешно"))
+                    {
+                        var login = text.Split(':')[0];
+                        var password = text.Split(':')[1];
+                        var resultAddingUser = db.AddUser(new Authorization { 
+                            Login = login,
+                            Password = password,
+                            UserId = userId
+                        });
 
+
+
+                    }
+                    await messageManager.SendMessageAsync(answer, userId, sheduleKeyboard);
                 }
             };
         }

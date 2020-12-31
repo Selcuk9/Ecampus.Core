@@ -11,11 +11,13 @@ namespace EcampusApi.Constans
         public static string LoginLink { get; }
         public static string BaseLink { get; }
         public static string ScheduleLink { get; }
+        public static string SchedulePostLink { get; }
         static Links()
         {
             BaseLink = "https://ecampus.ncfu.ru/";
             LoginLink = "account/login/";
             ScheduleLink = "schedule/my/student/";
+            SchedulePostLink = "Schedule/GetSchedule/";
         }
     }
 }

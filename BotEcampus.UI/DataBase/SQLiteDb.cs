@@ -1,4 +1,6 @@
-﻿using Microsoft.Data.Sqlite;
+﻿using BotEcampus.Core.Models;
+using Microsoft.Data.Sqlite;
+using System.Collections.Generic;
 using System.IO;
 
 namespace BotEcampus.UI.DataBase
@@ -16,10 +18,32 @@ namespace BotEcampus.UI.DataBase
             }
             connection = new SqliteConnection($"Data source = {pathDb}");
         }
-        public void AddUser()
+        public bool AddUser(Authorization authData)
         {
+            lock (this)
+            {
+                List<string> auth = new();
+                if (auth != null)
+                {
+                    connection.Open();
+                    string login = authData.Login;
+                    string password = authData.Password;
+                    var userId = authData.UserId;
+                    var command = connection.CreateCommand();
+                    command.Parameters.AddWithValue("$userId",userId);
+                    command.Parameters.AddWithValue("$password",password);
+                    command.Parameters.AddWithValue("$login",login);
 
-
+                    command.CommandText =
+                    @"
+                    INSERT INTO Users(UserId,Login,Password)
+                    VALUES($userId,$login,$password)
+                    ";
+                    var result = command.ExecuteReader();
+                    return true;
+                }
+                return false;
+            }
         }
 
 
