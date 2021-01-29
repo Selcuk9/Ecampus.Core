@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "EcampusApi": {
+      "commandName": "Executable",
+      "executablePath": "C:\\Users\\Selcuk\\source\\repos\\Ecampus.Core\\BotEcampus.UI\\bin\\Debug\\net5.0\\BotEcampus.UI.exe"
+    }
+  }
+}

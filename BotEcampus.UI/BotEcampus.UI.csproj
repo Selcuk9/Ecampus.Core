@@ -6,8 +6,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Files\" />
-    <Folder Include="Services\Implementation\" />
+    <Compile Remove="Files\**" />
+    <Compile Remove="Services\Implementation\**" />
+    <EmbeddedResource Remove="Files\**" />
+    <EmbeddedResource Remove="Services\Implementation\**" />
+    <None Remove="Files\**" />
+    <None Remove="Services\Implementation\**" />
   </ItemGroup>
 
   <ItemGroup>

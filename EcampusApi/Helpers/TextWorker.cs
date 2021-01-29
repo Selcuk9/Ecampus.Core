@@ -44,7 +44,7 @@ namespace EcampusApi.Helpers
                         $"{null} " +
                         $"{lesson.LessonType} " +
                         $"{string.Join(',', lesson.Groups.Select(gr => gr.Name))}\n" +
-                        $"&#128372;{lesson.Teacher.Name}\n" +
+                        $"&#128372;{lesson?.Teacher?.Name}\n" +
                         $"&#128216;&#128216;&#128216;&#128216;&#128216;&#128216;&#128216;&#128216;&#128216;&#128216;&#128216;&#128216;\n";
                 }
             }

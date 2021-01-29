@@ -7,8 +7,10 @@ using JSONUtils;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net.Http;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace EcampusApi.Services
@@ -54,12 +56,30 @@ namespace EcampusApi.Services
                 var doc = parser.ParseDocument(content);
                 var element = doc.QuerySelector("script[type='text/javascript']");
                 var id = TextWorker.GetUserId(element.TextContent);
-                var jsonShedule = await GetJsonSchedule(id);
+                var jsonShedule = await GetJsonSchedule(id,DateTime.Now);
                 var schedule = JsonConvert.DeserializeObject<IList<Root>>(jsonShedule);
                 return schedule;
             }
             return new List<Root>();
         }
+
+        public async Task<IList<Root>> GetScheduleOnNextWeekAsync()
+        {
+            var scheduleResponse = await client.GetAsync(Links.BaseLink + Links.ScheduleLink);
+
+            if (scheduleResponse.IsSuccessStatusCode)
+            {
+                var content = await scheduleResponse.Content.ReadAsStringAsync();
+                var doc = parser.ParseDocument(content);
+                var element = doc.QuerySelector("script[type='text/javascript']");
+                var id = TextWorker.GetUserId(element.TextContent);
+                var jsonShedule = await GetJsonSchedule(id, DateTime.Now.AddDays(7));
+                var schedule = JsonConvert.DeserializeObject<IList<Root>>(jsonShedule);
+                return schedule;
+            }
+            return new List<Root>();
+        }
+
         /// <summary>
         /// Получаем расписание на след. неделю
         /// </summary>
@@ -146,11 +166,11 @@ namespace EcampusApi.Services
         /// </summary>
         /// <param name="content"></param>
         /// <returns></returns>
-        private async Task<string> GetJsonSchedule(string id)
+        private async Task<string> GetJsonSchedule(string id,DateTime date)
         {
             var body = new 
             { 
-                Date = DateTime.Now.Date.ToString("yyyy-MM-dd") + "T00:00:00.000Z",
+                Date = date.ToString("yyyy-MM-dd") + "T00:00:00.000Z",
                 Id = Convert.ToInt32(id),
                 TargetType = 4
             };
@@ -159,6 +179,62 @@ namespace EcampusApi.Services
             var json = await response.Content.ReadAsStringAsync();
             return json;
         }
-   
+
+        public async Task<Student> GetStudentIdentify()
+        {
+            var student = new Student();
+            var reponsePass= await client.GetAsync("https://ecampus.ncfu.ru/home/pass");
+            if (reponsePass.IsSuccessStatusCode)
+            {
+                var person = await reponsePass.Content.ReadAsStringAsync();
+                var parser = new HtmlParser();
+                var doc = parser.ParseDocument(person);
+                var scriptEl = doc.QuerySelector("script:nth-child(5)");
+                if (scriptEl != null)
+                {
+                    var content = scriptEl.TextContent;
+                    student = ParseStudentData(content);
+                }
+            }
+            return student;
+        }
+        private Student ParseStudentData(string content)
+        {
+            var student = new Student();
+            content = content.Replace("\n", "");
+            var regex = new Regex(@"surname:.*}\)");
+            var matches = regex.Match(content);
+
+            if (matches.Success)
+            {
+                var reg = new Regex("'.*?'");
+                var data = matches.Value.Split(',');
+
+                var res = reg.Match(data[0]);
+                student.Surname = res.Value.Replace("\'", "");
+
+                res = reg.Match(data[1]);
+                student.Name = res.Value.Replace("\'", "");
+
+                res = reg.Match(data[2]);
+                student.LastName = res.Value.Replace("\'", "");
+
+                res = reg.Match(data[3]);
+                student.Position = res.Value.Replace("\'", "");
+
+                res = reg.Match(data[4]);
+                student.ValidTo = res.Value.Replace("\'", "");
+
+                res = reg.Match(data[5]);
+                student.Number = res.Value.Replace("\'", "");
+
+                res = reg.Match(data[6]);
+                student.Guid = Guid.Parse(res.Value.Replace("\'", ""));
+
+                res = reg.Match(data[7]);
+                student.ImgUrl = res.Value.Replace("\'", "");
+            }
+            return student;
+        }
     }
 }

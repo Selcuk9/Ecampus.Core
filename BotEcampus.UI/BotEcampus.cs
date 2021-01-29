@@ -37,54 +37,83 @@ namespace BotEcampus.Core
                 var sheduleKeyboard = Commands.GetOptionalKeyboard();
                 EcampusClient clientECampus = new EcampusClient();
                 var isExist = db.GetUserById(userId);
-                if (message.Text.ToLower() == "начать")
+                try
                 {
-                    if (isExist == null)
+                    if (isExist == null && !text.Contains(":") && text.Split(':').Length != 2)
                     {
-                       await messageManager.SendMessageAsync("Здравствуйте, я ваш помощник Хасан, пожалуйста введите ваш Логин и пароль " +
-                          "от \"Электронный кампус СКФУ\"\nПример: login:password", userId);
+                        await messageManager.SendMessageAsync("Здравствуйте, я ваш помощник Хасан, пожалуйста введите ваш Логин и пароль " +
+                             "от \"Электронный кампус СКФУ\"\nПример: login:password", userId);
                         return;
+                    }
+                    if (text.ToLower() == "начать")
+                    {
+                        if (isExist == null)
+                        {
+                            await messageManager.SendMessageAsync("Здравствуйте, я ваш помощник Хасан, пожалуйста введите ваш Логин и пароль " +
+                               "от \"Электронный кампус СКФУ\"\nПример: login:password", userId);
+                            return;
+                        }
+                        else
+                        {
+                            await messageManager.SendMessageAsync("Функционал бота", userId);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    await messageManager.SendMessageAsync("ЭТО КОСЯК ОТПРАВЬ СЕЛИ ОН ПОЧИНИТ" + ex.Message, userId);
+                }
+
+
+
+                // ДЛЯ АВТОРИЗОВАННЫХ ЮЗЕРОВ
+                try
+                {
+                    if (isExist != null)
+                    {
+                        var login = await clientECampus.LoginAsync(isExist.Split(':')[0], isExist.Split(':')[1]);
+
+                        if (login.IsSuccess)
+                        {
+                            string answer = await Commands.GetAnswerForAuthorizeUser(text, clientECampus);
+                            if (string.IsNullOrEmpty(answer) || string.IsNullOrWhiteSpace(answer))
+                            {
+                                answer = "Для данной недели расписание не предоставлено.";
+                            }
+                            await messageManager.SendMessageAsync(answer, userId, sheduleKeyboard);
+                        }
+                        else
+                        {
+                            await messageManager.SendMessageAsync("Сервер вернул ошибку", userId, sheduleKeyboard);
+                        }
+
                     }
                     else
                     {
-                        await messageManager.SendMessageAsync("Функционал бота", userId, sheduleKeyboard);
+
+                        var answer = await Commands.GetAnswerAnonymousUser(text, clientECampus);
+                        if (answer.Contains("успешно"))
+                        {
+                            var login = text.Split(':')[0];
+                            var password = text.Split(':')[1];
+                            var resultAddingUser = db.AddUser(new Authorization
+                            {
+                                Login = login,
+                                Password = password,
+                                UserId = userId
+                            });
+                            await messageManager.SendMessageAsync(answer, userId, sheduleKeyboard);
+                            return;
+                        }
+                        await messageManager.SendMessageAsync(answer, userId);
                     }
+                }
+                catch (Exception ex)
+                {
+                    await messageManager.SendMessageAsync("ЭТО КОСЯК ОТПРАВЬ СЕЛИ ОН ПОЧИНИТ" + ex.Message, userId);
                 }
 
                 
-                if (isExist != null)
-                {
-                    var login = await clientECampus.LoginAsync(isExist.Split(':')[0], isExist.Split(':')[1]);
-                    if (login.IsSuccess)
-                    {
-                        string answer = await Commands.GetAnswerForAuthorizeUser(text, clientECampus);
-                        await messageManager.SendMessageAsync(answer, userId, sheduleKeyboard);
-                    }
-                    else
-                    {
-                        await messageManager.SendMessageAsync("Сервер вернул ошибку", userId, sheduleKeyboard);
-                    }
-                    
-                }
-                else
-                {
-                    
-                    var answer =  await Commands.GetAnswerAnonymousUser(text, clientECampus);
-                    if (answer.Contains("успешно"))
-                    {
-                        var login = text.Split(':')[0];
-                        var password = text.Split(':')[1];
-                        var resultAddingUser = db.AddUser(new Authorization { 
-                            Login = login,
-                            Password = password,
-                            UserId = userId
-                        });
-
-
-
-                    }
-                    await messageManager.SendMessageAsync(answer, userId, sheduleKeyboard);
-                }
             };
         }
     }

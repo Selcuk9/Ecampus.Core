@@ -75,35 +75,43 @@ namespace VkApi.Group
                 UserId = fromId,
                 Message = message,
                 Keyboard = keyboard,
-                RandomId = new Random().Next(int.MaxValue)
+                RandomId = 0,
+                
             });
             return response == 20;
         }
         private void LongPollEventLoop()
         {
-        
-            //Запускаем бесконечный цикл опроса
-            while (true)
-            {
-                var longPollHistoryResponse = _api.Groups.GetBotsLongPollHistory(new BotsLongPollHistoryParams
-                {
-                    Ts = ts.ToString(),
-                    Key = key,
-                    Server = server,
-                    Wait = 10
-                });
-                ts = longPollHistoryResponse.Ts;
 
-                foreach (var update in longPollHistoryResponse.Updates)
+            //Запускаем бесконечный цикл опроса
+            try
+            {
+                while (true)
                 {
-                    if (update.Type.ToString() == "message_new")
+                    var longPollHistoryResponse = _api.Groups.GetBotsLongPollHistory(new BotsLongPollHistoryParams
                     {
-                        OnNewMessage.Invoke(
-                            update.MessageNew.Message
-                            );
+                        Ts = ts.ToString(),
+                        Key = key,
+                        Server = server,
+                        Wait = 10
+                    });
+                    ts = longPollHistoryResponse.Ts;
+
+                    foreach (var update in longPollHistoryResponse.Updates)
+                    {
+                        if (update.Type.ToString() == "message_new")
+                        {
+                            OnNewMessage.Invoke(
+                                update.MessageNew.Message
+                                );
+                        }
                     }
                 }
-                Thread.Sleep(200);
+            }
+            catch (Exception)
+            {
+                StartMessageHandling();
+                return;
             }
         }
 
