@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <UserSecretsId>6894480a-a98a-4fac-b1d9-e82a374ad365</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BotEcampus.UI\BotEcampus.UI.csproj" />
+  </ItemGroup>
+
+</Project>

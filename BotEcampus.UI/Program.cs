@@ -5,12 +5,12 @@ using System.Threading.Tasks;
 
 namespace BotEcampus.UI
 {
-    class Program
+   public class Program
     {
-        static void Main(string[] args)
+       public static void Main()
         {
             SQLiteDb db = new SQLiteDb("Files/BotEcampus.sqlite3");
-
+            //e640a613d3b9f530426bb962c9fd3d94d2890e9bd7a0d1d0f6c4f76332f99505fee9e072a9189a86c8de5
             var bot = new BotEcampus.Core.BotEcampus("172a4bff3319bac7443b4194070291f76401d" +
                 "1b5c77d9d03b9344cded5ef71202ab8480430f2abda2dc93",db);
             bot.RunVkBot();
