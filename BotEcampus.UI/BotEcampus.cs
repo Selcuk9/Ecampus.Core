@@ -75,18 +75,21 @@ namespace BotEcampus.Core
 
                         if (login.IsSuccess)
                         {
+                            //TODO
+                            //Ответы бота должны иметь класс, где мы можем увидеть тип ответа(txt,img,video and etc)
                             string answer = await Commands.GetAnswerForAuthorizeUser(text, clientECampus);
-                            if (string.IsNullOrEmpty(answer) || string.IsNullOrWhiteSpace(answer))
+                            if (answer.Contains(".jpg"))
                             {
-                                answer = "Для данной недели расписание не предоставлено.";
+                                await messageManager.SendMessagePhoto(answer,userId);
+                                return;
                             }
                             await messageManager.SendMessageAsync(answer, userId, sheduleKeyboard);
+                            return;
                         }
                         else
                         {
                             await messageManager.SendMessageAsync("Сервер вернул ошибку", userId, sheduleKeyboard);
                         }
-
                     }
                     else
                     {

@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
 
 namespace EcampusApi.Entity
 {
@@ -19,5 +16,6 @@ namespace EcampusApi.Entity
         public string Number { get; set; }
         public Guid Guid { get; set; }
         public string ImgUrl { get; set; }
+        public Stream ProfilePhoto { get; set; }
     }
 }

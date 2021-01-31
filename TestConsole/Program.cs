@@ -16,6 +16,7 @@ namespace TestConsole
             Canvas canvas = new Canvas();
             Grid grid = new Grid();
             
+            
 
             #region MyRegion
 

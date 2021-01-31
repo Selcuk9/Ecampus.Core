@@ -1,5 +1,9 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using VkApi.Group.Interfaces;
@@ -115,6 +119,25 @@ namespace VkApi.Group
             }
         }
 
+        public async Task<bool> SendMessagePhoto(string pathFile, long? fromId)
+        {
+            var uploadServer = await _api.Photo.GetMessagesUploadServerAsync((int)fromId);
+            // Загрузить файл.
+            var wc = new WebClient();
+            var responseFile = Encoding.ASCII.GetString(wc.UploadFile(uploadServer.UploadUrl, pathFile));
+            // Сохранить загруженный файл
+            var attachment = _api.Photo.SaveMessagesPhoto(responseFile);
+
+            //Отправить сообщение с нашим вложением
+            await _api.Messages.SendAsync(new MessagesSendParams
+            {
+                UserId = fromId, //Id получателя
+                Attachments = attachment, //Вложение
+                RandomId = 0 //Уникальный идентификатор
+            });
+            File.Delete(pathFile);
+            return true;
+        }
         
     }
 }

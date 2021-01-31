@@ -1,6 +1,8 @@
 ﻿using EcampusApi.Entity;
 using EcampusApi.Helpers;
 using EcampusApi.Services;
+using SixLabors.ImageSharp;
+using System;
 using System.Threading.Tasks;
 using VkNet.Enums.SafetyEnums;
 using VkNet.Model.Keyboard;
@@ -24,7 +26,7 @@ namespace BotEcampus.UI.Services.BotCommand
                         var schedules = await clientECampus.GetScheduleAsync();
                         if (schedules.Count <= 0)
                         {
-                            return "";
+                            return "Для данной недели расписание не предоставлено.";
                         }
                         var schedule = TextWorker.GetAllSchedule(schedules);
                         return schedule;
@@ -34,14 +36,16 @@ namespace BotEcampus.UI.Services.BotCommand
                     var schedulesNextWeek = await clientECampus.GetScheduleOnNextWeekAsync();
                     if (schedulesNextWeek.Count <= 0)
                     {
-                        return "";
+                           return "Для данной недели расписание не предоставлено.";
                     }
                     var scheduleNextWeek = TextWorker.GetAllSchedule(schedulesNextWeek);
                     return scheduleNextWeek;
+
                 case var text when message.ToLower().Contains("пропуск"):
-                    ///
-                    return "Скоро...";
-                    ///
+                    var passImage = await clientECampus.StudentPass();
+                    var passName = $"ImgPasses/{Guid.NewGuid().ToString()}";
+                    await passImage.SaveAsync(passName + ".jpg");
+                    return passName + ".jpg";
                     
             }
 
@@ -91,10 +95,6 @@ namespace BotEcampus.UI.Services.BotCommand
             return keyboard;
 
         }
-
-        private static async Task<Student> StudentData(EcampusClient client) =>
-            await client.GetStudentIdentify();
-     
 
         /// <summary>
         /// Метод собирает распсание в одну текстовую структуру для отправки
