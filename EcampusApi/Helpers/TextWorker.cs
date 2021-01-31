@@ -34,6 +34,7 @@ namespace EcampusApi.Helpers
             var text = "";
             foreach (var sch in schedule)
             {
+                text += "&#9989;&#9989;&#9989;&#9989;&#9989;&#9989;&#9989;&#9989;&#9989;&#9989;&#9989;&#9989;\n";
                 text += $"&#128197;{sch.WeekDay} {sch.Date.Day} {months[sch.Date.Month - 1]}\n" +
                     $"&#128213;&#128213;&#128213;&#128213;&#128213;&#128213;&#128213;&#128213;&#128213;&#128213;&#128213;&#128213;\n";
                 foreach (var lesson in sch.Lessons)
@@ -47,6 +48,7 @@ namespace EcampusApi.Helpers
                         $"&#128372;{lesson?.Teacher?.Name}\n" +
                         $"&#128216;&#128216;&#128216;&#128216;&#128216;&#128216;&#128216;&#128216;&#128216;&#128216;&#128216;&#128216;\n";
                 }
+                text += "\n";
             }
             return text;
         }

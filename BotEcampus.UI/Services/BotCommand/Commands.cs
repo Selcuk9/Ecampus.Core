@@ -87,10 +87,11 @@ namespace BotEcampus.UI.Services.BotCommand
         {
             var keyboard = new KeyboardBuilder()
                        .SetInline(false)
-                       .SetOneTime()
-                       .AddButton("Расписание", "btnScheduleToday", KeyboardButtonColor.Primary)
+                       .AddButton("Расписание", "btnScheduleToday", KeyboardButtonColor.Positive)
+                       .AddLine()
                        .AddButton("Расписание на след. неделю", "btnScheduleOnNextWeek", KeyboardButtonColor.Primary)
-                       .AddButton("Эл.пропуск", "EPass", KeyboardButtonColor.Primary)
+                       .AddLine()
+                       .AddButton("Эл.пропуск", "EPass", KeyboardButtonColor.Negative)
                        .Build();
             return keyboard;
 

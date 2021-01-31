@@ -44,7 +44,7 @@ namespace VkApi.Group
         {
 
             // Соединяемся с сервером Long Poll запросов и получаем необходимые ts и pts
-            var longPoolServerResponse = _api.Groups.GetLongPollServer(200874156);
+            var longPoolServerResponse = _api.Groups.GetLongPollServer(202249381);
 
             ts = longPoolServerResponse.Ts;
             pts = longPoolServerResponse.Pts.ToString();
@@ -103,7 +103,7 @@ namespace VkApi.Group
 
                     foreach (var update in longPollHistoryResponse.Updates)
                     {
-                        if (update.Type.ToString() == "message_new")
+                       if (update.Type.ToString() == "message_new")
                         {
                             OnNewMessage.Invoke(
                                 update.MessageNew.Message
@@ -133,7 +133,8 @@ namespace VkApi.Group
             {
                 UserId = fromId, //Id получателя
                 Attachments = attachment, //Вложение
-                RandomId = 0 //Уникальный идентификатор
+                RandomId = 0, //Уникальный идентификатор
+                
             });
             File.Delete(pathFile);
             return true;
