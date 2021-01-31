@@ -16,11 +16,11 @@ namespace BotEcampus.Core
     {
         private IVKMessageManager messageManager;
         private IDataBase db;
-        public BotEcampus(string accessToken, IDataBase dataBase)
+        public BotEcampus(string accessToken, ulong groupId, IDataBase dataBase)
         {
             if (!string.IsNullOrWhiteSpace(accessToken) && !string.IsNullOrEmpty(accessToken))
             {
-                messageManager = new VKMessageManager(accessToken);
+                messageManager = new VKMessageManager(accessToken, groupId);
                 messageManager.StartMessageHandling();
             }
             db = dataBase;
@@ -41,16 +41,16 @@ namespace BotEcampus.Core
                 {
                     if (isExist == null && !text.Contains(":") && text.Split(':').Length != 2)
                     {
-                        await messageManager.SendMessageAsync("Здравствуйте, я ваш помощник Хасан, пожалуйста введите ваш Логин и пароль " +
-                             "от \"Электронный кампус СКФУ\"\nПример: login:password", userId);
+                        await messageManager.SendMessageAsync("Здравствуйте, я ваш помощник CampBot, пожалуйста авторизуйтесь" +
+                             "в \"Электронный кампус СКФУ\"\nПример: login:password", userId);
                         return;
                     }
                     if (text.ToLower() == "начать")
                     {
                         if (isExist == null)
                         {
-                            await messageManager.SendMessageAsync("Здравствуйте, я ваш помощник Хасан, пожалуйста введите ваш Логин и пароль " +
-                               "от \"Электронный кампус СКФУ\"\nПример: login:password", userId);
+                            await messageManager.SendMessageAsync("Здравствуйте, я ваш помощник CampBot, пожалуйста авторизуйтесь" +
+                             "в \"Электронный кампус СКФУ\"\nПример: login:password", userId);
                             return;
                         }
                         else

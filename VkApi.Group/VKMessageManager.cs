@@ -24,12 +24,13 @@ namespace VkApi.Group
         private string key;
         private string server;
         public event Action<Message> OnNewMessage;
+        private readonly ulong groupId;
 
         //Событие для уведомления о новом сообщении
 
-        public VKMessageManager(string accessToken)
+        public VKMessageManager(string accessToken, ulong groupId)
         {
-
+            this.groupId = groupId;
             //Авторизуемся с учетной записью пользователя. 
             //Для обхода блокировки сообщений используем ApplicationId какого-нибудь официально зарегистрированного приложения
             //либо используем Bypass. В примере ApplicationId приложения Kate Mobile. 
@@ -44,7 +45,7 @@ namespace VkApi.Group
         {
 
             // Соединяемся с сервером Long Poll запросов и получаем необходимые ts и pts
-            var longPoolServerResponse = _api.Groups.GetLongPollServer(202249381);
+            var longPoolServerResponse = _api.Groups.GetLongPollServer(groupId);
 
             ts = longPoolServerResponse.Ts;
             pts = longPoolServerResponse.Pts.ToString();
