@@ -41,16 +41,18 @@ namespace BotEcampus.Core
                 {
                     if (isExist == null && !text.Contains(":") && text.Split(':').Length != 2)
                     {
-                        await messageManager.SendMessageAsync("Здравствуйте, я ваш помощник CampBot, пожалуйста авторизуйтесь" +
-                             "в \"Электронный кампус СКФУ\"\nПример: login:password", userId);
+                        await messageManager.SendMessageAsync("Здравствуйте, я Ваш помощник ECampusBot &#129302;\n" +
+                               "Для дальнейшей работы со мной, Вам нужно авторизоваться в \"Электронный кампус СКФУ\"&#128104;&#8205;&#128187;\n" +
+                               "Пример: login:password", userId);
                         return;
                     }
                     if (text.ToLower() == "начать")
                     {
                         if (isExist == null)
                         {
-                            await messageManager.SendMessageAsync("Здравствуйте, я ваш помощник CampBot, пожалуйста авторизуйтесь" +
-                             "в \"Электронный кампус СКФУ\"\nПример: login:password", userId);
+                            await messageManager.SendMessageAsync("Здравствуйте, я Ваш помощник ECampusBot &#129302;\n" +
+                               "Для дальнейшей работы со мной, Вам нужно авторизоваться в \"Электронный кампус СКФУ\"&#128104;&#8205;&#128187;\n" +
+                               "Пример: login:password", userId);
                             return;
                         }
                         else
@@ -61,7 +63,7 @@ namespace BotEcampus.Core
                 }
                 catch (Exception ex)
                 {
-                    await messageManager.SendMessageAsync("ЭТО КОСЯК ОТПРАВЬ СЕЛИ ОН ПОЧИНИТ" + ex.Message, userId);
+                    await messageManager.SendMessageAsync("ЭТУ ОШИБКУ ОТПРАВЬ СЕЛЕ ОН ПОЧИНИТ " + ex.Message, userId);
                 }
 
 
@@ -113,7 +115,7 @@ namespace BotEcampus.Core
                 }
                 catch (Exception ex)
                 {
-                    await messageManager.SendMessageAsync("ЭТО КОСЯК ОТПРАВЬ СЕЛИ ОН ПОЧИНИТ" + ex.Message, userId);
+                    await messageManager.SendMessageAsync("ЭТУ ОШИБКУ ОТПРАВЬ СЕЛЕ ОН ПОЧИНИТ " + ex.Message, userId);
                 }
 
                 

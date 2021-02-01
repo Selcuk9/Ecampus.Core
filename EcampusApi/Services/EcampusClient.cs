@@ -203,6 +203,10 @@ namespace EcampusApi.Services
                 }
 
             }
+            if (reponsePass.ReasonPhrase == "Forbidden")
+            {
+                return new Student() { ValidTo = "БАН"};
+            }
             return student;
         }
         public async Task<Image> StudentPass()
@@ -213,7 +217,17 @@ namespace EcampusApi.Services
         }
         private async Task<Image> DrawUserPass(Student pass)
         {
-
+            if (pass.ValidTo == "БАН")
+            {
+                var fontBan = SystemFonts.CreateFont("Arial", 40, FontStyle.Regular);
+                Image imageBan = new Image<Rgba32>(1500, 500);
+                var reason = "СКФУ не предоставляет иностранным студентам электронные пропуска";
+                var glyphsBan = TextBuilder.GenerateGlyphs(reason, new Point(0, 200), new RendererOptions(fontBan));
+                imageBan.Mutate(ctx => ctx
+                .Fill(Color.Blue)
+                .Fill(Color.White, glyphsBan));
+                return imageBan;
+            }
             Image image = Image.Load(@"Files\pass_layout.png"); // 810 x 510
             Image image1 = await Image.LoadAsync(pass.ProfilePhoto);
             image1.Mutate(im => im.Resize(250, 310));

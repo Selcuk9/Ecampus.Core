@@ -84,11 +84,28 @@ namespace BotEcampus.UI.DataBase
             command.CommandText =
             @"
                 DELETE FROM Users
-                WHERE UserId = @$id
+                WHERE UserId = $id
             ";
             command.Parameters.AddWithValue("$id", id);
             var result = command.ExecuteReader();
             result.Close();
+        }
+        public string GetVKS(string teacherName)
+        {
+            connection.Open();
+            var name = string.Empty;
+            var command = connection.CreateCommand();
+            command.CommandText =
+            $@"                
+                SELECT Url FROM VKS
+                WHERE TeacherName Like '%{teacherName.Trim()}%';
+            ";
+            var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                name = reader.GetValue(0).ToString();
+            }
+            return name;
         }
     }
 }

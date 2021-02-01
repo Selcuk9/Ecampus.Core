@@ -12,5 +12,6 @@ namespace BotEcampus.UI.DataBase
         public string GetUserById(long? id);
         public bool AddUser(Authorization authData);
         public void RemoveById(long? id);
+        public string GetVKS(string nameTeacher);
     }
 }

@@ -69,7 +69,8 @@ namespace VkApi.Group
             { 
                 UserId = fromId,
                 Message = message,
-                RandomId = new Random().Next(int.MaxValue)
+                RandomId = new Random().Next(int.MaxValue),
+                DontParseLinks = true
             });
             return response == 20;
         }
@@ -81,7 +82,7 @@ namespace VkApi.Group
                 Message = message,
                 Keyboard = keyboard,
                 RandomId = 0,
-                
+                DontParseLinks = true
             });
             return response == 20;
         }

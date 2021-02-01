@@ -1,4 +1,6 @@
-﻿using EcampusApi.Entity;
+﻿using BotEcampus.UI.DataBase;
+using BotEcampus.UI.Helpers.Schedule;
+using EcampusApi.Entity;
 using EcampusApi.Helpers;
 using EcampusApi.Services;
 using SixLabors.ImageSharp;
@@ -11,6 +13,11 @@ namespace BotEcampus.UI.Services.BotCommand
 {
     public static class Commands
     {
+        private static BuildSchedule buildSchedule;
+        static Commands()
+        {
+            buildSchedule = new BuildSchedule(new SQLiteDb("Files/BotEcampus.sqlite3"));
+        }
         /// <summary>
         /// Метод, где возвращается ответ только для авторизованных пользователей
         /// </summary>
@@ -28,7 +35,7 @@ namespace BotEcampus.UI.Services.BotCommand
                         {
                             return "Для данной недели расписание не предоставлено.";
                         }
-                        var schedule = TextWorker.GetAllSchedule(schedules);
+                        var schedule = buildSchedule.GetAllSchedule(schedules);
                         return schedule;
                     }
 
@@ -38,7 +45,7 @@ namespace BotEcampus.UI.Services.BotCommand
                     {
                            return "Для данной недели расписание не предоставлено.";
                     }
-                    var scheduleNextWeek = TextWorker.GetAllSchedule(schedulesNextWeek);
+                    var scheduleNextWeek = buildSchedule.GetAllSchedule(schedulesNextWeek);
                     return scheduleNextWeek;
 
                 case var text when message.ToLower().Contains("пропуск"):
@@ -49,7 +56,7 @@ namespace BotEcampus.UI.Services.BotCommand
                     
             }
 
-            return "Функционал";
+            return "Я не понимаю что вы говорите";
         }
         /// <summary>
         /// Метод, где возвращается ответ только для не авторизованных пользователей
@@ -74,8 +81,9 @@ namespace BotEcampus.UI.Services.BotCommand
                     }
                 case var text when message.ToLower().Contains("начать"):
                     {
-                        return "Здравствуйте, пожалуйста введите ваш Логин и пароль " +
-                        "от \"Электронный кампус СКФУ\"\nПример: login:password";
+                        return "Здравствуйте, я Ваш помощник ECampusBot &#129302;\n" +
+                               "Для дальнейшей работы со мной, Вам нужно авторизоваться в \"Электронный кампус СКФУ\"&#128104;&#8205;&#128187;\n" +
+                               "Пример: login:password";
                     }
 
             }
