@@ -121,7 +121,7 @@ namespace VkApi.Group
             }
         }
 
-        public async Task<bool> SendMessagePhoto(string pathFile, long? fromId)
+        public async Task<bool> SendMessagePhotoAsync(string pathFile, long? fromId)
         {
             var uploadServer = await _api.Photo.GetMessagesUploadServerAsync((int)fromId);
             // Загрузить файл.
@@ -141,6 +141,16 @@ namespace VkApi.Group
             File.Delete(pathFile);
             return true;
         }
-        
+
+        /// <summary>
+        /// Проверяем находится ли пользователь в группе
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public async Task<bool> IsMemeberInGroupAsync(string groupId,long? userId)
+        {
+            var member = await _api.Groups.IsMemberAsync(groupId,userId,null,null);
+            return member.Select(m => m.Member).FirstOrDefault();
+        }
     }
 }

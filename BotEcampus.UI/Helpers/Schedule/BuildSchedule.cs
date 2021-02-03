@@ -33,7 +33,7 @@ namespace BotEcampus.UI.Helpers.Schedule
                 {
                     var typeLessonsAndVks = Vks(lesson.Aud.Name, lesson?.Teacher?.Name);
                     var teacherType = TeacherType(lesson?.Teacher?.Name);
-                    text += $"&#128212;{lesson.PairNumberStart} {lesson.LessonName}:\n" +
+                    text += $"&#128212;{lesson.PairNumberStart} {lesson.LessonName} [{lesson.TimeBegin.ToString("HH.mm")} - {lesson.TimeEnd.ToString("HH.mm")}]:\n" +
                         $"&#128205;{lesson.Discipline}\n" +
                         $"&#128205;{typeLessonsAndVks} " +
                         $"{null} " +

@@ -14,6 +14,7 @@ namespace VkApi.Group.Interfaces
         public void StartMessageHandling();
         public Task<bool> SendMessageAsync(string message, long? fromId);
         public Task<bool> SendMessageAsync(string message, long? fromId, MessageKeyboard keyboard);
-        public Task<bool> SendMessagePhoto(string pathFile, long? fromId);
+        public Task<bool> SendMessagePhotoAsync(string pathFile, long? fromId);
+        public Task<bool> IsMemeberInGroupAsync(string groupId ,long? userId);
     }
 }

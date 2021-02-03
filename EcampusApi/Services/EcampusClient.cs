@@ -49,7 +49,7 @@ namespace EcampusApi.Services
         }
 
         /// <summary>
-        /// Получаем расписание на текущею неделю
+        /// Получаем расписание на текущею неделю(потом завернем в один метод:))
         /// </summary>
         /// <returns></returns>
         public async Task<IList<Root>> GetScheduleAsync()
@@ -62,7 +62,19 @@ namespace EcampusApi.Services
                 var doc = parser.ParseDocument(content);
                 var element = doc.QuerySelector("script[type='text/javascript']");
                 var id = TextWorker.GetUserId(element.TextContent);
-                var jsonShedule = await GetJsonSchedule(id,DateTime.Now);
+
+                var weekNumber = (int)DateTime.Now.DayOfWeek;
+                var dataRequest = DateTime.Now;
+                if (weekNumber != 0)
+                {
+                    var weekStart = weekNumber - 1;
+                    dataRequest = dataRequest.AddDays(-weekStart);
+                }
+                else
+                {
+                    dataRequest = dataRequest.AddDays(-6);
+                }
+                var jsonShedule = await GetJsonSchedule(id, dataRequest);
                 var schedule = JsonConvert.DeserializeObject<IList<Root>>(jsonShedule);
                 return schedule;
             }
@@ -79,7 +91,19 @@ namespace EcampusApi.Services
                 var doc = parser.ParseDocument(content);
                 var element = doc.QuerySelector("script[type='text/javascript']");
                 var id = TextWorker.GetUserId(element.TextContent);
-                var jsonShedule = await GetJsonSchedule(id, DateTime.Now.AddDays(7));
+
+                var weekNumber = (int)DateTime.Now.DayOfWeek;
+                var dataRequest = DateTime.Now;
+                if (weekNumber != 0)
+                {
+                    var weekStart = weekNumber - 1;
+                    dataRequest = dataRequest.AddDays(-weekStart);
+                }
+                else
+                {
+                    dataRequest = dataRequest.AddDays(-6);
+                }
+                var jsonShedule = await GetJsonSchedule(id, dataRequest.AddDays(7));
                 var schedule = JsonConvert.DeserializeObject<IList<Root>>(jsonShedule);
                 return schedule;
             }

@@ -16,10 +16,12 @@ namespace BotEcampus.Core
     {
         private IVKMessageManager messageManager;
         private IDataBase db;
+        private readonly string groupId;
         public BotEcampus(string accessToken, ulong groupId, IDataBase dataBase)
         {
             if (!string.IsNullOrWhiteSpace(accessToken) && !string.IsNullOrEmpty(accessToken))
             {
+                this.groupId = groupId.ToString();
                 messageManager = new VKMessageManager(accessToken, groupId);
                 messageManager.StartMessageHandling();
             }
@@ -34,6 +36,7 @@ namespace BotEcampus.Core
                 var userId = message.FromId;
                 var fdd = message.Payload;
                 var text = message.Text;
+                
                 var sheduleKeyboard = Commands.GetOptionalKeyboard();
                 EcampusClient clientECampus = new EcampusClient();
                 var isExist = db.GetUserById(userId);
@@ -63,7 +66,8 @@ namespace BotEcampus.Core
                 }
                 catch (Exception ex)
                 {
-                    await messageManager.SendMessageAsync("ЭТУ ОШИБКУ ОТПРАВЬ СЕЛЕ ОН ПОЧИНИТ " + ex.Message, userId);
+                    await messageManager.SendMessageAsync("Упс! Что-то пошло не так &#129301;\n" +
+                        "Мы найдем и исправим эту ошибку &#128373; \n" + ex.Message, userId);
                 }
 
 
@@ -82,7 +86,7 @@ namespace BotEcampus.Core
                             string answer = await Commands.GetAnswerForAuthorizeUser(text, clientECampus);
                             if (answer.Contains(".jpg"))
                             {
-                                await messageManager.SendMessagePhoto(answer,userId);
+                                await messageManager.SendMessagePhotoAsync(answer,userId);
                                 return;
                             }
                             await messageManager.SendMessageAsync(answer, userId, sheduleKeyboard);
@@ -115,11 +119,13 @@ namespace BotEcampus.Core
                 }
                 catch (Exception ex)
                 {
-                    await messageManager.SendMessageAsync("ЭТУ ОШИБКУ ОТПРАВЬ СЕЛЕ ОН ПОЧИНИТ " + ex.Message, userId);
+                    await messageManager.SendMessageAsync("Упс! Что-то пошло не так &#129301;\n" +
+                        "Мы найдем и исправим эту ошибку &#128373; \n" + ex.Message, userId);
                 }
 
                 
             };
+
         }
     }
 }
